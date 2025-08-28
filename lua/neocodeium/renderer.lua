@@ -49,14 +49,12 @@ local function delete_virttext(id)
    return nvim_buf_del_extmark(0, ns, id)
 end
 
----Returns `str` with leading tabs converted to spaces.
+---Returns `str` with tabs converted to spaces.
 ---@param str string
 ---@return string
-local function leading_tabs_to_spaces(str)
-   str = str:gsub("^\t*", function(m)
-      return string.rep(" ", #m * fn.shiftwidth())
-   end)
-   return str
+local function tabs_to_spaces(str)
+   local result = str:gsub("\t", string.rep(" ", fn.shiftwidth()))
+   return result
 end
 
 -- Renderer methods ---------------------------------------- {{{1
@@ -80,7 +78,7 @@ end
 ---@param lnum? lnum
 ---@return extmark_id
 function Renderer:set_virt_inline(id, str, col, lnum)
-   self.inline_virt_text[1][1] = str
+   self.inline_virt_text[1][1] = tabs_to_spaces(str)
    return nvim_buf_set_extmark(0, ns, lnum or state.pos[1], col, {
       id = id,
       virt_text_pos = "inline",
@@ -113,7 +111,7 @@ function Renderer:set_virt_block(text, lnum)
       state.block.visible = true
       local block_lines = {}
       for line in vim.gsplit(text, "\n") do
-         table.insert(block_lines, { { leading_tabs_to_spaces(line), hlgroup } })
+         table.insert(block_lines, { { tabs_to_spaces(line), hlgroup } })
       end
 
       return nvim_buf_set_extmark(0, ns, lnum, 0, {
