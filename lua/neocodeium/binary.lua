@@ -171,7 +171,7 @@ function Bin:get_version()
       if #result > 0 and string.find(result[#result], "%d+%.%d+%.%d+") then
          return result[#result]
       else
-         log.info("Failed to get binary version, falling back to default", { type = log.BOTH })
+         log.debug("Failed to get binary version, falling back to default", { type = log.BOTH })
          return ""
       end
    else
